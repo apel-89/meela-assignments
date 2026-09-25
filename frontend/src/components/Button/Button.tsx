@@ -14,6 +14,7 @@ export const Button = (props: ButtonProps) => {
 
   return (
     <button
+      aria-label={props["aria-label"]}
       class={`button ${props.variant ?? "default"}`}
       onClick={props.onClick}
       disabled={props.disabled}

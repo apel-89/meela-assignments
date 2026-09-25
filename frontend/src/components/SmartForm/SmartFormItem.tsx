@@ -1,4 +1,4 @@
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 import type { Answer, Question } from "../../lib/schema";
 
 interface SmartFormItemProps {
@@ -10,6 +10,19 @@ interface SmartFormItemProps {
 const isString = (v: unknown) => (typeof v === "string" ? v : "");
 
 export const SmartFormItem = (props: SmartFormItemProps) => {
+  const inputId = () => `q-${props.question.id}`;
+  const helpId = () => `${inputId()}-help`;
+  const isGroup = () =>
+    props.question.inputType === "single" ||
+    props.question.inputType === "multi";
+  const help = (
+    <Show when={props.question.help}>
+      <p id={helpId()} class="smart-form-item-help">
+        {props.question.help}
+      </p>
+    </Show>
+  );
+
   const renderInput = () => {
     switch (props.question.inputType) {
       case "single":
@@ -62,9 +75,11 @@ export const SmartFormItem = (props: SmartFormItemProps) => {
       case "text":
         return (
           <input
+            id={inputId()}
+            aria-describedby={props.question.help ? helpId() : undefined}
             class="smart-form-item-input"
             type="text"
-            value={isString(props.value) ?? ""}
+            value={isString(props.value)}
             onInput={(e) =>
               props.onChange({ [props.question.id]: e.currentTarget.value })
             }
@@ -73,13 +88,18 @@ export const SmartFormItem = (props: SmartFormItemProps) => {
       case "select":
         return (
           <select
+            id={inputId()}
+            aria-describedby={props.question.help ? helpId() : undefined}
             class="smart-form-item-input"
             name={props.question.id}
-            value={isString(props.value) ?? ""}
+            value={isString(props.value)}
             onChange={(e) =>
               props.onChange({ [props.question.id]: e.currentTarget.value })
             }
           >
+            <option value="" disabled>
+              Choose a city
+            </option>
             {props.question?.options?.map((option) => (
               <option value={option.value}>{option.label}</option>
             ))}
@@ -90,9 +110,21 @@ export const SmartFormItem = (props: SmartFormItemProps) => {
     }
   };
 
-  return (
+  return isGroup() ? (
+    <fieldset
+      class="smart-form-item"
+      aria-describedby={props.question.help ? helpId() : undefined}
+    >
+      <legend class="smart-form-item-question">{props.question.title}</legend>
+      {help}
+      {renderInput()}
+    </fieldset>
+  ) : (
     <div class="smart-form-item">
-      <label class="smart-form-item-question">{props.question.title}</label>
+      <label class="smart-form-item-question" for={inputId()}>
+        {props.question.title}
+      </label>
+      {help}
       {renderInput()}
     </div>
   );

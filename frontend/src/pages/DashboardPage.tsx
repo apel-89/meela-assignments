@@ -15,36 +15,34 @@ import { pruneAnswers, steps, type Answer } from "../lib/schema";
 const DEBOUNCE_MS = 1000;
 
 export const DashboardPage = () => {
-  const [completed, setCompleted] = createSignal(false);
+  const [started, setStarted] = createSignal(false);
   const [formDialogIsOpen, setFormDialogIsOpen] = createSignal(false);
 
-  const [submission, { mutate }] = createResource(
-    formDialogIsOpen,
-    async (isOpen) => {
-      if (!isOpen) return undefined;
-
-      const existingId = new URLSearchParams(location.search).get("id");
-      if (existingId) {
-        try {
-          return await getSubmission(existingId);
-        } catch (e) {
-          if (!(e instanceof ApiError && e.isNotFound)) throw e;
-        }
+  const [submission, { mutate }] = createResource(started, async () => {
+    const existingId = new URLSearchParams(location.search).get("id");
+    if (existingId) {
+      try {
+        return await getSubmission(existingId);
+      } catch (e) {
+        if (!(e instanceof ApiError && e.isNotFound)) throw e;
       }
+    }
 
-      const { id } = await createSubmission();
-      history.replaceState({}, "", `?id=${id}`);
-      return getSubmission(id);
-    },
-  );
+    const { id } = await createSubmission();
+    history.replaceState({}, "", `?id=${id}`);
+    return getSubmission(id);
+  });
+
+  const completed = () => submission()?.completed ?? false;
 
   let timer: number;
-  const handleChange = async (payload: PatchPayload) => {
+  const handleChange = (payload: PatchPayload, immediate = false) => {
     clearTimeout(timer);
-    timer = setTimeout(async () => {
-      const updated = await patchSubmission(payload);
-      mutate(updated);
-    }, DEBOUNCE_MS);
+    if (immediate) {
+      patchSubmission(payload);
+    } else {
+      timer = setTimeout(() => patchSubmission(payload), DEBOUNCE_MS);
+    }
   };
 
   const handleSubmit = async (answers: Answer) => {
@@ -52,7 +50,6 @@ export const DashboardPage = () => {
     const pruned = pruneAnswers(steps, answers);
     const updated = await completeSubmission(submission()!.id, pruned);
     mutate(updated);
-    setCompleted(true);
   };
 
   return (
@@ -75,7 +72,14 @@ export const DashboardPage = () => {
         </span>
       </div>
       <div style={{ display: "flex", "justify-content": "center" }}>
-        <Button onClick={() => setFormDialogIsOpen(true)}>Start</Button>
+        <Button
+          onClick={() => {
+            setStarted(true);
+            setFormDialogIsOpen(true);
+          }}
+        >
+          Start
+        </Button>
       </div>
       <Dialog
         open={formDialogIsOpen()}
@@ -85,20 +89,15 @@ export const DashboardPage = () => {
         {completed() ? (
           <p>Thank you for completing the form!</p>
         ) : (
-          <Show when={submission()} keyed>
-            <SmartForm
-              formValues={steps}
-              onChange={handleChange}
-              onSubmit={handleSubmit}
-              submission={
-                submission() ?? {
-                  id: "",
-                  answers: {},
-                  current_step: 0,
-                  completed: false,
-                }
-              }
-            />
+          <Show when={submission()}>
+            {(s) => (
+              <SmartForm
+                formValues={steps}
+                onChange={handleChange}
+                onSubmit={handleSubmit}
+                submission={s()}
+              />
+            )}
           </Show>
         )}
       </Dialog>

@@ -1,5 +1,5 @@
-import { createEffect, createSignal, For } from "solid-js";
-import { createStore, reconcile } from "solid-js/store";
+import { createSignal, For } from "solid-js";
+import { createStore } from "solid-js/store";
 import type { PatchPayload, Submission } from "../../lib/api";
 import { type Answer, type FormSchema } from "../../lib/schema";
 import { Button } from "../Button/Button";
@@ -11,7 +11,7 @@ interface SmartFormProps {
   submission: Submission;
   formValues: FormSchema;
   onSubmit: (answers: Answer) => void;
-  onChange: (payload: PatchPayload) => void;
+  onChange: (payload: PatchPayload, immediate?: boolean) => void;
 }
 
 export const SmartForm = (props: SmartFormProps) => {
@@ -20,10 +20,6 @@ export const SmartForm = (props: SmartFormProps) => {
   );
   const [answers, setAnswers] = createStore<Answer>({
     ...props.submission.answers,
-  });
-
-  createEffect(() => {
-    setAnswers(reconcile(props.submission.answers));
   });
 
   const visible = () =>
@@ -43,11 +39,14 @@ export const SmartForm = (props: SmartFormProps) => {
   const handleNavigate = (steps: number) => {
     const newStep = activeStep() + steps;
     setActiveStep(newStep);
-    props.onChange({
-      id: props.submission.id,
-      currentStep: newStep,
-      answers: { ...answers },
-    });
+    props.onChange(
+      {
+        id: props.submission.id,
+        currentStep: newStep,
+        answers: { ...answers },
+      },
+      true,
+    );
   };
 
   return (

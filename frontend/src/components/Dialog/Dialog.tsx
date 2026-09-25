@@ -22,14 +22,17 @@ export const Dialog = (props: DialogProps) => {
     <dialog
       class="dialog"
       ref={ref}
+      onClose={() => props.onClose()}
+      aria-labelledby="dialog-title"
       onClick={(e) => {
         if (e.target === ref) props.onClose();
       }}
     >
       <div class="dialog-content">
         <div class="dialog-header">
-          <h2>{props.title}</h2>
+          <h2 id="dialog-title">{props.title}</h2>
           <Button
+            aria-label="Close"
             variant="ghost"
             onClick={props.onClose}
             Icon={AiFillCloseCircle}

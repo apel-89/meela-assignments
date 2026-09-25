@@ -93,7 +93,10 @@ export const steps: Question[][] = [
       help: "Pick somewhere you're often based so we can match you as close by as possible.",
       inputType: "select",
       options: CITIES,
-      showIf: (a: Answer) => a.format === "in_person" || a.format === "either",
+      showIf: (a: Answer) =>
+        a.format === "in_person" ||
+        a.format === "either" ||
+        a.format === undefined,
     },
     {
       id: "channel",
@@ -104,7 +107,10 @@ export const steps: Question[][] = [
         { value: "phone", label: "Phone" },
         { value: "chat", label: "Chat" },
       ],
-      showIf: (a: Answer) => a.format === "digital" || a.format === "either",
+      showIf: (a: Answer) =>
+        a.format === "digital" ||
+        a.format === "either" ||
+        a.format === undefined,
     },
   ],
 ];

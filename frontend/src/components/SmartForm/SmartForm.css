@@ -74,3 +74,15 @@
   outline: 2px solid var(--color-burgundy);
   outline-offset: 2px;
 }
+
+fieldset.smart-form-item {
+  border: 0;
+  padding: 0;
+  margin: 0 0 1rem;
+  min-width: 0;
+}
+
+legend.smart-form-item-question {
+  padding: 0;
+  margin-bottom: 0.5rem;
+}

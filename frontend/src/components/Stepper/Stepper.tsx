@@ -7,7 +7,7 @@ export const Stepper = (props: StepperProps) => {
   return (
     <div class="stepper">
       <div class="step">
-        {props.step + 1} / {props.totalSteps}
+        Step {props.step + 1} of {props.totalSteps}
       </div>
     </div>
   );
