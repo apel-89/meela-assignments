@@ -3,7 +3,6 @@ use std::env;
 use log::info;
 use poem::{
     EndpointExt, Route, Server,
-    endpoint::{StaticFileEndpoint, StaticFilesEndpoint},
     error::ResponseError,
     get, handler, post,
     http::StatusCode,
@@ -25,8 +24,6 @@ enum Error {
     Var(#[from] std::env::VarError),
     #[error(transparent)]
     Dotenv(#[from] dotenv::Error),
-    #[error("Query failed")]
-    QueryFailed,
 }
 
 impl ResponseError for Error {
@@ -41,26 +38,6 @@ impl ResponseError for Error {
 async fn init_pool() -> Result<PgPool, Error> {
     let pool = PgPool::connect(&env::var("DATABASE_URL")?).await?;
     Ok(pool)
-}
-
-#[derive(Serialize)]
-struct HelloResponse {
-    hello: String,
-}
-
-#[handler]
-async fn hello(
-    Data(pool): Data<&PgPool>,
-    Path(name): Path<String>,
-) -> Result<Json<HelloResponse>, Error> {
-    let r = sqlx::query!("select concat('Hello ', $1::text) as hello", name)
-        .fetch_one(pool)
-        .await?;
-    let Some(hello) = r.hello else {
-        Err(Error::QueryFailed)?
-    };
-
-    Ok(Json(HelloResponse { hello }))
 }
 
 
@@ -184,13 +161,9 @@ async fn main() -> Result<(), Error> {
     info!("Initialize db pool");
     let pool = init_pool().await?;
     let app = Route::new()
-        .at("/api/hello/:name", get(hello))
         .at("/api/submissions", post(create_submission))
         .at("/api/submissions/:id", get(get_submission).patch(patch_submission))
         .at("/api/submissions/:id/complete", post(complete_submission))
-        .at("/favicon.ico", StaticFileEndpoint::new("www/favicon.ico"))
-        .nest("/static/", StaticFilesEndpoint::new("www"))
-        .at("*", StaticFileEndpoint::new("www/index.html"))
         .data(pool);
     Server::new(TcpListener::bind("0.0.0.0:3005"))
         .run(app)
