@@ -1,0 +1,89 @@
+:root {
+  --color-pink: #ff98a4;
+  --color-burgundy: #6b1f2c;
+  --color-green: #06332b;
+  --color-surface-green: var(--color-green);
+  --color-light-green: #cadcd9;
+  --color-lighter-green: #f6fffe;
+  --color-neon: #ebff00;
+  --color-neon-hover: #d4e704;
+  --color-light-pink: #fcd8dd;
+  --color-orange: rgb(218, 116, 22);
+  --color-light-orange: rgb(247, 160, 79);
+  --color-border-grey: #d3d5d3;
+  --color-border-grey-hover: #9c9c9c;
+
+  --text-h: #08060d;
+  --bg: var(--color-burgundy);
+  --border: #e5e4e7;
+  --shadow:
+    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+
+  --sans: system-ui, "Segoe UI", Roboto, sans-serif;
+  --logo: Georgia, "Times New Roman", serif;
+  --heading: system-ui, "Segoe UI", Roboto, sans-serif;
+
+  font: 1rem/185% var(--sans);
+  letter-spacing: 0.12px;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
+
+body {
+  margin: 0;
+}
+
+.navbar {
+  width: 100%;
+  height: 6rem;
+  background: var(--color-pink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo {
+  color: var(--color-burgundy);
+  font-family: var(--logo);
+  font-size: 5rem;
+  user-select: none;
+  font-weight: 500;
+}
+
+#root {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  align-items: center;
+}
+
+.page-wrapper {
+  margin: 1.5rem;
+}
+
+.page {
+  background-color: #fff;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+h2 {
+  color: var(--color-burgundy);
+  font-weight: 400;
+  font-size: 2rem;
+}
+
+span {
+  color: var(--text);
+  font-size: 1.25rem;
+}

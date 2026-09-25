@@ -1,0 +1,41 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update submissions\n         set answers = $2,\n             completed = true,\n             updated_at = now()\n         where id = $1\n         returning id, answers, current_step, completed",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "answers",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 2,
+        "name": "current_step",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "completed",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Jsonb"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "e63a25cb5a0a251ad00f5f36b46001a5cd7ae1e537bddeff5d45ecb0aca2e495"
+}
